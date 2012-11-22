@@ -1,0 +1,13 @@
+log_filename: results/multi_test.log
+emi:
+  - id:  emi-C9A71A71
+    type: m1.small
+max_instances_to_start: 5000
+# List of users available for testing
+users:
+ - id: admin
+   cred_dir: users/admin/ # directory with all the credentials
+   nb_keypairs: 1 # number of key pairs to generate
+   nb_groups: 1 #number of groups to create
+   admin: yes # use this admin user to query about available ressources and instances state
+

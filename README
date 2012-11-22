@@ -1,0 +1,69 @@
+Dependencies
+------------
+
+The following packages are required to run the testing script:
+
+ * euca2ools
+ * python-twisted-bin
+ * python-yaml
+
+Register emis
+-------------
+
+A set of images need to be registered in UEC and made available for testing.
+
+Create users
+------------
+
+The list of expected test users can be found in ./users/. Prior to running uec tests, each user need to be created on UEC and its credentials made available in the relevant directory (this has to be done via the Eucalyptus admin Web interface right now).
+
+Example:
+
+ $ ls users/admin*/
+ users/admin/:
+ cloud-cert.pem  euca2-admin-fb3ae674-cert.pem  euca2-admin-fb3ae674-pk.pem  eucarc  jssecacerts
+
+ users/admin1/:
+ cloud-cert.pem  euca2-admin1-a26e69de-cert.pem  euca2-admin1-a26e69de-pk.pem  eucarc  jssecacerts
+
+There needs to be at least *one* admin user to be used by the testing script for checking resource availability as well as all instance states.
+
+Register images
+-----------------
+
+The register_image.sh script in images/ can be used to automate the registration of images in UEC for testing purposes.
+
+The image url as well as the release can be edited at the top of the script. The script will always grab and register both i386 and AMD64 images.
+
+
+
+Test configuration
+------------------
+
+Test configuration are specified in a yaml file. For example, the list of emis and registered users to be used by the test are specified in the configuration file. A test run should always include:
+
+ * both i386 and AMD64 images;
+ * all instance types available for the image(s)
+
+See example configuration files config_single.yaml and config_multi.yaml.
+
+Running a test
+--------------
+
+To run a test:
+ ./uec_test.py -c config_single.yaml
+
+See help message for other options:
+ ./uec_test.py -h
+
+Helper scripts
+--------------
+
+There are some helper scripts:
+
+1. ./get-logs.sh -- will scp to each of the UEC machines, and collect /var/log/eucalyptus/*.
+2. ./set-ssh.sh -- will copy your SSH public key into the target machines' ~/.ssh/authorized_keys.
+
+Both scripts source ./helper.sh for common things (like the machine names in the rig, userId, etc).
+
+

@@ -1,0 +1,45 @@
+
+log_filename: results/multi_test.log
+
+emi:
+
+  - id:  emi-985F1388
+    type: m1.small
+#  - id:  emi-C9A71A71
+#    type: c1.medium
+#  - id:  emi-C9A71A71
+#    type: m1.large
+#  - id:  emi-C9A71A71
+#    type: m1.xlarge
+#  - id:  emi-C9A71A71
+#    type: c1.xlarge
+
+# Limit the total number of instances to be started by the script
+# If set to 0, the script will always start new instances
+max_instances_to_start: 5000
+
+# List of users available for testing
+users:
+
+ - id: admin
+   cred_dir: users/admin/ # directory with all the credentials
+   nb_keypairs: 1 # number of key pairs to generate
+   nb_groups: 1 #number of groups to create
+   admin: yes # use this admin user to query about available ressources and instances state
+# - id: admin1
+#   cred_dir: users/admin1/ # directory with all the credentials
+#   nb_keypairs: 3 # number of key pairs to generate
+#   nb_groups: 2 #number of groups to create
+# - id: user1
+#   cred_dir: users/user1/ # directory with all the credentials
+#   nb_keypairs: 2 # number of key pairs to generate
+#   nb_groups: 4 #number of groups to create
+# - id: user2
+#   cred_dir: users/user2/ # directory with all the credentials
+#   nb_keypairs: 4 # number of key pairs to generate
+#   nb_groups: 2 #number of groups to create
+# - id: user3
+#   cred_dir: users/user3/ # directory with all the credentials
+#   nb_keypairs: 2 # number of key pairs to generate
+#   nb_groups: 3 #number of groups to create
+

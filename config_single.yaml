@@ -1,0 +1,44 @@
+
+# Location of the log file
+log_filename: results/single_test.log
+
+# List of emis available for testing
+emi:
+
+# i386
+
+ - id:  emi-674719D2
+   type: m1.small
+ - id:  emi-674719D2
+   type: c1.medium
+ - id:  emi-674719D2
+   type: m1.large
+ - id:  emi-674719D2
+   type: m1.xlarge
+ - id:  emi-674719D2
+   type: c1.xlarge
+
+# AMD64
+
+ - id:  emi-167A18B8
+   type: m1.small
+ - id:  emi-167A18B8
+   type: c1.medium
+ - id:  emi-167A18B8
+   type: m1.large
+ - id:  emi-167A18B8
+   type: m1.xlarge
+ - id:  emi-167A18B8
+   type: c1.xlarge
+
+# Limit the total number of instances to be started by the script
+# If set to 0, the script will always start new instances
+max_instances_to_start: 2000
+
+# List of users available for testing
+users:
+ - id: admin
+   cred_dir: users/admin/ # directory with all the credentials
+   nb_keypairs: 1 # number of key pairs to generate
+   nb_groups: 1 #number of groups to create
+   admin: yes # use this admin user to query about available ressources and instances state
