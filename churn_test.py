@@ -40,7 +40,7 @@ euca_get_console_output = 'euca-get-console-output'
 class Instance(object):
     TEST_STATES = [ 'not-tested', 'being-tested', 'success', 'failed',
                     'rescheduled', 'boot-failed' ]
-    TEST_MAX_RETRIES = 40
+    TEST_MAX_RETRIES = 50
 
     def __init__(self, emi, user, ssh_key, group):
         self.emi = emi
@@ -82,7 +82,7 @@ class Instance(object):
             # Only trigger a test when the state has been changed to running
             if self._state == "running" and self._test_state != 'being-tested':
                 self.logger.debug("Scheduling test")
-                reactor.callLater(random.randint(5,10) + random.random(),
+                reactor.callLater(random.randint(5,20) + random.random(),
                                  self.test)
 
     @property
@@ -385,7 +385,7 @@ def availableRessource(output, instances, users, admin_user):
             i.start()
     if config['max_instances_to_start'] == 0 \
        or len(instances) < config['max_instances_to_start']:
-        reactor.callLater(1,
+        reactor.callLater(5,
                       checkRessources, instances, users, admin_user)
     else:
         logging.info("Max instances reached. Stop checking for %s" %
