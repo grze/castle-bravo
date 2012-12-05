@@ -385,7 +385,7 @@ def availableRessource(output, instances, users, admin_user):
             i.start()
     if config['max_instances_to_start'] == 0 \
        or len(instances) < config['max_instances_to_start']:
-        reactor.callLater(5,
+        reactor.callLater(1,
                       checkRessources, instances, users, admin_user)
     else:
         logging.info("Max instances reached. Stop checking for %s" %
@@ -429,7 +429,7 @@ def instancesState(output, instances, admin_user):
         logging.info("Test run completed")
         reactor.stop()
     else:
-        reactor.callLater(random.randint(10, 20) + random.random(),
+        reactor.callLater(random.randint(5, 10) + random.random(),
                           checkInstancesState, instances, admin_user)
 
 def cleanUp(instances, users,  wait=True):
