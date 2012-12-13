@@ -171,11 +171,15 @@ class Instance(object):
             self.logger.info("Test successful [%s]" % self._test_retries)
             self.test_state = "success"
             self.logger.debug("Test success output: ssh %s\n%s" % (self.id,output))
-            self.terminate()
+            output = self.getProcessOutput(euca_terminate_instances,
+                                            args= [self.id])
+            output.addCallback(self.terminate)
         elif self._test_state == 'boot-failed':
             self.logger.debug("Test boot-failed output: ssh %s\n%s" % (self.id,output))
             self.test_state = "boot-failed"
-            self.terminate()
+            output = self.getProcessOutput(euca_terminate_instances,
+                                            args= [self.id])
+            output.addCallback(self.terminate)
         elif self._test_retries <= self.TEST_MAX_RETRIES:
             self.logger.warning("Rescheduling test (%s/%s)" %
                              (self._test_retries, self.TEST_MAX_RETRIES))
@@ -200,17 +204,18 @@ class Instance(object):
        output.addCallback(self.terminate)
 
     def terminate(self, output=None):
-        if output != None and 'shutting-down' in output:
+        if output != None and self.id in output:
             self.finished = True
             if self.id is None:
                 self.state = "terminated"
                 self.logger.warning("instance has already terminated, last test state=%s" % self.test_state)
+                self.terminated("TERMINATED")
             else:
-                reactor.callLater(5,self.terminate)
+                output = self.getProcessOutput(euca_terminate_instances,
+                                               args= [self.id])
+                output.addCallback(self.terminate)
         elif self.state == "terminated" or self.finished:
-            output = self.getProcessOutput(euca_terminate_instances,
-                                           args= [self.id])
-            output.addCallback(self.terminated)
+            self.terminated("TERMINATED")
     
     def terminated(self, output):
         self.logger.info("Terminated")
@@ -264,7 +269,7 @@ class User(object):
 
     def errGroupAdded(self, output):
         self.logger.debug("Keypair error: %s" % (output))
-        self.keypairs.append("eucatest-k0.priv")
+        self.group.append("eucatest-g0")
 
     def groupAdded(self, output):
         self.logger.debug("Group added output: %s" % (output))
