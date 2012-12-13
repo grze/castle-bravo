@@ -148,7 +148,7 @@ class Instance(object):
                     "root@%s" % (self.pub_ip),
                     "echo TEST_SUCCESS" ]                    
             self.logger.info("Testing instance: ssh %s %s" % (self.id,self.pub_ip))
-            output = myutils.getProcessOutput('ssh', args, errortoo=True)
+            output = myutils.getProcessOutput('echo', ['TEST_SUCCESS'], errortoo=True)
             output.addCallback(self.tested)
         elif self._test_retries <= self.TEST_MAX_RETRIES:
             self.logger.warning("Rescheduling test ping (%s/%s)" %
@@ -237,12 +237,15 @@ class User(object):
         for k in self.keypair_names:
             self.logger.debug("Adding keypair %s" % (k))
             output = self.getProcessOutput(euca_add_keypair, args = [k])
-            output.addCallback(self.keypairAdded)
+            output.addCallbacks(self.keypairAdded,self.errKeypairAdded)
         for g in self.group_names:
             self.logger.debug("Adding group %s" % (g))
             output = self.getProcessOutput(euca_add_group,
                                            args = ['-d', 'UEC-test', g])
-            output.addCallback(self.groupAdded)
+            output.addCallbacks(self.groupAdded,self.errGroupAdded)
+
+    def errKeypairAdded(self, output):
+        self.logger.debug("Keypair error: %s" % (output))
 
     def keypairAdded(self, output):
         self.logger.debug("Keypair added output: %s" % (output))
@@ -260,6 +263,9 @@ class User(object):
                 privkey_fh.write("%s\n" % (l))
         if privkey_fh:
             privkey_fh.close()
+
+    def errGroupAdded(self, output):
+        self.logger.debug("Keypair error: %s" % (output))
 
     def groupAdded(self, output):
         self.logger.debug("Group added output: %s" % (output))
