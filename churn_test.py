@@ -270,6 +270,12 @@ class User(object):
     def errGroupAdded(self, output):
         self.logger.debug("Keypair error: %s" % (output))
         self.group.append("eucatest-g0")
+        self.logger.debug("Authorizing group %s" % (group))
+        output = self.getProcessOutput(euca_authorize,
+                                       args = [group,
+                                               '-P', 'tcp', '-p', '22',
+                                               '-s',  '0.0.0.0/0' ])
+        output.addCallback(self.groupAuthorized)
 
     def groupAdded(self, output):
         self.logger.debug("Group added output: %s" % (output))
