@@ -40,7 +40,7 @@ euca_get_console_output = 'euca-get-console-output'
 class Instance(object):
     TEST_STATES = [ 'not-tested', 'being-tested', 'success', 'failed',
                     'rescheduled', 'boot-failed' ]
-    TEST_MAX_RETRIES = 50
+    TEST_MAX_RETRIES = 200
 
     def __init__(self, emi, user, ssh_key, group):
         self.emi = emi
