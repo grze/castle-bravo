@@ -266,6 +266,7 @@ class User(object):
 
     def errGroupAdded(self, output):
         self.logger.debug("Keypair error: %s" % (output))
+        self.keypairs.append("eucatest-k0.priv")
 
     def groupAdded(self, output):
         self.logger.debug("Group added output: %s" % (output))
