@@ -208,7 +208,7 @@ class Instance(object):
             else:
                 output = self.getProcessOutput(euca_terminate_instances,
                                                args= [self.id])
-                output.addCallback(self.terminate)
+                output.addCallback(self.terminated)
         elif self.state == "terminated" and self.finished:
             output = self.getProcessOutput(euca_terminate_instances,
                                            args= [self.id])
