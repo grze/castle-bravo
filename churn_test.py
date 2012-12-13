@@ -40,7 +40,7 @@ euca_get_console_output = 'euca-get-console-output'
 class Instance(object):
     TEST_STATES = [ 'not-tested', 'being-tested', 'success', 'failed',
                     'rescheduled', 'boot-failed' ]
-    TEST_MAX_RETRIES = 50
+    TEST_MAX_RETRIES = 200
 
     def __init__(self, emi, user, ssh_key, group):
         self.emi = emi
@@ -110,7 +110,7 @@ class Instance(object):
                                               ])
         output.addCallbacks(self.started, self.errStarted)
         # Terminate the instance no matter what
-        reactor.callLater(12*60, self.terminate)
+#        reactor.callLater(12*60, self.terminate)
 
     def started(self, output):
         self.logger.debug("Instance start output: %s" % (output))
@@ -200,16 +200,14 @@ class Instance(object):
        output.addCallback(self.terminate)
 
     def terminate(self, output=None):
-        if self.state != "terminated":
+        if output != None and 'shutting-down' in output:
             self.finished = True
             if self.id is None:
                 self.state = "terminated"
                 self.logger.warning("instance has already terminated, last test state=%s" % self.test_state)
             else:
-                output = self.getProcessOutput(euca_terminate_instances,
-                                               args= [self.id])
-                output.addCallback(self.terminated)
-        elif self.state == "terminated" and self.finished:
+                reactor.callLater(5,self.terminate)
+        elif self.state == "terminated" or self.finished:
             output = self.getProcessOutput(euca_terminate_instances,
                                            args= [self.id])
             output.addCallback(self.terminated)
