@@ -87,10 +87,10 @@ class Instance(object):
                 return
         if self._state != value:
             self.logger.debug("New state: %s => %s" % (self._state, value))
+            if self._state == "pending" and value == "running":
+                self._test_retries = 0
             self._state = value
             # Only trigger a test when the state has been changed to running
-            if self._state == "running":
-                self._test_retries = 0
             if self._state == "running" and self._test_state != 'being-tested':
                 self.logger.debug("Scheduling test")
                 reactor.callLater(random.randint(5,20) + random.random(),
@@ -137,6 +137,7 @@ class Instance(object):
 
     def errStarted(self, output):
         self.logger.error("Instance failed to start: %s" % (output))
+        self.test_state = 'boot-failed'
 
     def test(self):
         if self.state == "pending":
@@ -171,7 +172,8 @@ class Instance(object):
                     "root@%s" % (self.pub_ip),
                     "echo TEST_SUCCESS" ]                    
             self.logger.info("Testing instance: ssh %s %s" % (self.id,self.pub_ip))
-            output = myutils.getProcessOutput('echo', ['TEST_SUCCESS'], errortoo=True)
+            output = myutils.getProcessOutput('ssh', args, errortoo=True)
+#            output = myutils.getProcessOutput('echo', ['TEST_SUCCESS'], errortoo=True)
             output.addCallback(self.tested)
         elif self._test_retries <= self.TEST_MAX_RETRIES:
             self.logger.warning("Rescheduling test ping (%s/%s)" %
