@@ -76,10 +76,21 @@ class Instance(object):
     def state(self, value):
         self.logger.debug("State: %s" % (value))
         # The state has changed
+        if self.state == "pending":
+            self._test_retries += 1
+            if self._test_retries > self.TEST_MAX_RETRIES:
+                self.logger.error("Instance remained in pending for MAX_RETRIES, terminating instance")
+                self.test_state = 'boot-failed'
+                output = self.getProcessOutput(euca_terminate_instances,
+                                                args= [self.id])
+                output.addCallback(self.terminate)
+                return
         if self._state != value:
             self.logger.debug("New state: %s => %s" % (self._state, value))
             self._state = value
             # Only trigger a test when the state has been changed to running
+            if self._state == "running":
+                self._test_retries = 0
             if self._state == "running" and self._test_state != 'being-tested':
                 self.logger.debug("Scheduling test")
                 reactor.callLater(random.randint(5,20) + random.random(),
@@ -128,6 +139,18 @@ class Instance(object):
         self.logger.error("Instance failed to start: %s" % (output))
 
     def test(self):
+        if self.state == "pending":
+            self._test_retries += 1
+            if self._test_retries <= self.TEST_MAX_RETRIES:
+                self.logger.error("Not running - aborting scheduled test.")
+                return
+            else:
+                self.logger.error("Instance remained in pending for MAX_RETRIES, terminating instance")
+                self.test_state = 'boot-failed'
+                output = self.getProcessOutput(euca_terminate_instances,
+                                                args= [self.id])
+                output.addCallback(self.terminate)
+                return
         if self.state != "running":
             self.logger.error("Not running - aborting scheduled test.")
             return
@@ -268,8 +291,8 @@ class User(object):
             privkey_fh.close()
 
     def errGroupAdded(self, output):
-        self.logger.debug("Keypair error: %s" % (output))
-        self.group.append("eucatest-g0")
+        group = "eucatest-g0"
+        self.group.append(group)
         self.logger.debug("Authorizing group %s" % (group))
         output = self.getProcessOutput(euca_authorize,
                                        args = [group,
